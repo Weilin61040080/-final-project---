@@ -1,5 +1,6 @@
 package com.example.lab11;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -13,10 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RaceActivity extends AppCompatActivity {
 
@@ -26,6 +29,7 @@ public class RaceActivity extends AppCompatActivity {
     private List<String> restaurantNames = new ArrayList<>();
     private SQLiteDatabase dbrw;
     private Handler handler;
+    private AtomicBoolean raceFinished = new AtomicBoolean(false);
 
     @Override
     protected void onDestroy() {
@@ -52,15 +56,20 @@ public class RaceActivity extends AppCompatActivity {
         handler = new Handler(Looper.myLooper(), new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {
+                if (raceFinished.get()) {
+                    return true; // 比賽已結束，停止處理
+                }
+
                 SeekBar seekBar = seekBars.get(msg.what);
                 seekBar.setProgress(seekBar.getProgress() + 1);
 
-                if (seekBar.getProgress() >= 100) {
-                    Toast.makeText(RaceActivity.this, restaurantNames.get(msg.what) + "勝", Toast.LENGTH_SHORT).show();
+                if (seekBar.getProgress() >= 100 && !raceFinished.get()) {
+                    String winner = restaurantNames.get(msg.what);
+                    showWinnerDialog(winner);
                     btn_start2.setEnabled(true);
-                    return true;
+                    raceFinished.set(true); // 設置比賽結束狀態
                 }
-                return false;
+                return true;
             }
         });
     }
@@ -99,6 +108,7 @@ public class RaceActivity extends AppCompatActivity {
 
     private void startRace() {
         btn_start2.setEnabled(false); // 比賽期間，不可重複操作
+        raceFinished.set(false); // 重置比賽狀態
         for (SeekBar seekBar : seekBars) {
             seekBar.setProgress(0); // 初始化進度
         }
@@ -106,7 +116,7 @@ public class RaceActivity extends AppCompatActivity {
         for (int i = 0; i < seekBars.size(); i++) {
             int index = i;
             new Thread(() -> {
-                while (seekBars.get(index).getProgress() < 100) {
+                while (!raceFinished.get() && seekBars.get(index).getProgress() < 100) {
                     try {
                         Thread.sleep((long) (Math.random() * 300));
                     } catch (InterruptedException e) {
@@ -118,5 +128,16 @@ public class RaceActivity extends AppCompatActivity {
                 }
             }).start();
         }
+    }
+
+    private void showWinnerDialog(String winner) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(RaceActivity.this);
+        dialog.setTitle("最終選擇");
+        dialog.setMessage("就決定是你了：" + winner);
+
+        dialog.setNeutralButton("確定", null);
+        AlertDialog winnerDialog = dialog.create();
+        winnerDialog.setCancelable(false);
+        winnerDialog.show();
     }
 }
