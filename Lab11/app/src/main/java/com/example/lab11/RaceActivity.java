@@ -132,8 +132,8 @@ public class RaceActivity extends AppCompatActivity {
 
     private void showWinnerDialog(String winner) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(RaceActivity.this);
-        dialog.setTitle("比賽結果");
-        dialog.setMessage("第一個獲勝的餐廳是：" + winner);
+        dialog.setTitle("最終選擇");
+        dialog.setMessage("就決定是你了：" + winner);
 
         dialog.setNeutralButton("確定", null);
         AlertDialog winnerDialog = dialog.create();
