@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private EditText ed_book;
-    private Button btn_query, btn_insert, btn_update, btn_delete;
+    private Button btn_query, btn_insert, btn_delete;
 
     private ListView listView;
     private ArrayAdapter<String> adapter;
@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         ed_book = findViewById(R.id.ed_book);
         btn_query = findViewById(R.id.btn_query);
         btn_insert = findViewById(R.id.btn_insert);
-        btn_update = findViewById(R.id.btn_update);
         btn_delete = findViewById(R.id.btn_delete);
         listView = findViewById(R.id.listView);
 
@@ -59,21 +58,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(MainActivity.this, "新增失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        btn_update.setOnClickListener(view -> {
-            if (ed_book.length() < 1)
-                Toast.makeText(MainActivity.this, "餐廳名請勿留空", Toast.LENGTH_SHORT).show();
-            else {
-                try {
-                    dbrw.execSQL("UPDATE myTable SET book = '" + ed_book.getText().toString() + "' WHERE book LIKE '" + ed_book.getText().toString() + "'");
-                    Toast.makeText(MainActivity.this, "成功更新餐廳名: " + ed_book.getText().toString(), Toast.LENGTH_SHORT).show();
-                    ed_book.setText("");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(MainActivity.this, "更新失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
