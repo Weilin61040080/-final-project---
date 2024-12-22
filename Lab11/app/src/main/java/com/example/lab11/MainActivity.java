@@ -1,5 +1,6 @@
 package com.example.lab11;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private EditText ed_book;
-    private Button btn_query, btn_insert, btn_delete;
+    private Button btn_query, btn_insert, btn_delete, btn_start;
 
     private ListView listView;
     private ArrayAdapter<String> adapter;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         btn_query = findViewById(R.id.btn_query);
         btn_insert = findViewById(R.id.btn_insert);
         btn_delete = findViewById(R.id.btn_delete);
+        btn_start = findViewById(R.id.btn_start);
         listView = findViewById(R.id.listView);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
@@ -47,9 +49,9 @@ public class MainActivity extends AppCompatActivity {
         dbrw = new MyDBHelper(this).getWritableDatabase();
 
         btn_insert.setOnClickListener(view -> {
-            if (ed_book.length() < 1)
+            if (ed_book.length() < 1) {
                 Toast.makeText(MainActivity.this, "餐廳名請勿留空", Toast.LENGTH_SHORT).show();
-            else {
+            } else {
                 try {
                     dbrw.execSQL("INSERT INTO myTable(book) values(?)",
                             new Object[]{ed_book.getText().toString()});
@@ -63,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btn_delete.setOnClickListener(view -> {
-            if (ed_book.length() < 1)
+            if (ed_book.length() < 1) {
                 Toast.makeText(MainActivity.this, "餐廳名請勿留空", Toast.LENGTH_SHORT).show();
-            else {
+            } else {
                 try {
                     dbrw.execSQL("DELETE FROM myTable WHERE book LIKE '" + ed_book.getText().toString() + "'");
                     Toast.makeText(MainActivity.this, "刪除餐廳名: " + ed_book.getText().toString(), Toast.LENGTH_SHORT).show();
@@ -79,10 +81,11 @@ public class MainActivity extends AppCompatActivity {
 
         btn_query.setOnClickListener(view -> {
             Cursor c;
-            if (ed_book.length() < 1)
+            if (ed_book.length() < 1) {
                 c = dbrw.rawQuery("SELECT * FROM myTable", null);
-            else
+            } else {
                 c = dbrw.rawQuery("SELECT * FROM myTable WHERE book LIKE '" + ed_book.getText().toString() + "'", null);
+            }
 
             c.moveToFirst();
             items.clear();
@@ -93,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
             }
             adapter.notifyDataSetChanged();
             c.close();
+        });
+
+        btn_start.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, RaceActivity.class);
+            startActivity(intent);
         });
     }
 }
